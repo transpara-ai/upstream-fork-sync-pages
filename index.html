@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upstream Fork Sync State</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #5b667a;
+      --line: #d8dee8;
+      --surface: #f6f8fb;
+      --current: #137333;
+      --drift: #b05a00;
+      --missing: #7b4ab8;
+      --changed: #0b57d0;
+      --error: #b3261e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: #ffffff;
+    }
+    header {
+      padding: 28px 32px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      color: var(--muted);
+    }
+    main { padding: 24px 32px 36px; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 72px;
+    }
+    .metric strong {
+      display: block;
+      font-size: 26px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .metric span { color: var(--muted); }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    input, select {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      font: inherit;
+      min-height: 36px;
+      padding: 7px 10px;
+    }
+    input { min-width: min(360px, 100%); flex: 1; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: var(--surface);
+      color: #30394c;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    tr:last-child td { border-bottom: 0; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      color: #ffffff;
+      font-weight: 700;
+      padding: 3px 9px;
+      white-space: nowrap;
+    }
+    .current { background: var(--current); }
+    .drift { background: var(--drift); }
+    .missing { background: var(--missing); }
+    .changed { background: var(--changed); }
+    .error { background: var(--error); }
+    .muted { color: var(--muted); }
+    .empty { color: var(--muted); text-align: center; }
+    .error-text { color: var(--error); max-width: 520px; }
+    @media (max-width: 900px) {
+      header, main { padding-left: 16px; padding-right: 16px; }
+      table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Upstream Fork Sync State</h1>
+    <div class="meta">
+      <span>Generated 2026-06-12T11:08:10+00:00</span>
+      <span>Config <code>config/sync-map.json</code></span>
+      <span>Targets tinstaller</span>
+    </div>
+  </header>
+  <main>
+    <section class="summary" aria-label="Summary">
+      <div class="metric"><strong>1</strong><span>Total</span></div>
+      <div class="metric"><strong>0</strong><span>Current</span></div>
+      <div class="metric"><strong>0</strong><span>Drift</span></div>
+      <div class="metric"><strong>1</strong><span>Missing</span></div>
+      <div class="metric"><strong>0</strong><span>Errors</span></div>
+    </section>
+    <section class="controls" aria-label="Filters">
+      <input id="search" type="search" placeholder="Filter repositories, branches, SHAs, or errors">
+      <select id="state">
+        <option value="">All states</option>
+        <option value="current">Current</option>
+        <option value="drift">Drift</option>
+        <option value="missing">Missing</option>
+        <option value="error">Error</option>
+        <option value="changed">Changed</option>
+      </select>
+    </section>
+    <table id="matrix">
+      <thead>
+        <tr>
+          <th>State</th>
+          <th>Name</th>
+          <th>Upstream</th>
+          <th>Downstream</th>
+          <th>Upstream SHA</th>
+          <th>Downstream SHA</th>
+          <th>Auth</th>
+          <th>Action</th>
+          <th>Error</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-state="missing">
+          <td><span class="status missing">Missing</span></td>
+          <td><code>tinstaller</code></td>
+          <td><code>transpara/tinstaller:main</code></td>
+          <td><code>transpara-ai/tinstaller:upstream/main</code></td>
+          <td><code>25bffaeb475b</code></td>
+          <td><code>&lt;missing&gt;</code></td>
+          <td>public</td>
+          <td>Create mirror branch</td>
+          <td class="error-text"></td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+  <script>
+    const search = document.querySelector("#search");
+    const state = document.querySelector("#state");
+    const rows = Array.from(document.querySelectorAll("#matrix tbody tr[data-state]"));
+    function applyFilters() {
+      const query = search.value.trim().toLowerCase();
+      const selected = state.value;
+      for (const row of rows) {
+        const matchesState = !selected || row.dataset.state === selected;
+        const matchesQuery = !query || row.textContent.toLowerCase().includes(query);
+        row.hidden = !(matchesState && matchesQuery);
+      }
+    }
+    search.addEventListener("input", applyFilters);
+    state.addEventListener("change", applyFilters);
+  </script>
+</body>
+</html>
