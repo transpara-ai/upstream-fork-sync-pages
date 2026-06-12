@@ -16,6 +16,7 @@
       --missing: #7b4ab8;
       --changed: #0b57d0;
       --error: #b3261e;
+      --button: #254f9d;
     }
     * { box-sizing: border-box; }
     body {
@@ -116,6 +117,58 @@
     .muted { color: var(--muted); }
     .empty { color: var(--muted); text-align: center; }
     .error-text { color: var(--error); max-width: 520px; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-width: 180px;
+    }
+    .button {
+      align-items: center;
+      background: var(--button);
+      border: 1px solid var(--button);
+      border-radius: 6px;
+      color: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      font: inherit;
+      font-weight: 700;
+      min-height: 34px;
+      padding: 6px 10px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .button.secondary {
+      background: #ffffff;
+      color: var(--button);
+    }
+    details.drill {
+      max-width: 620px;
+    }
+    details.drill summary {
+      color: var(--button);
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .detail-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: minmax(120px, max-content) minmax(220px, 1fr);
+      margin: 10px 0 0;
+    }
+    .detail-grid dt {
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .detail-grid dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+    .copied {
+      color: var(--current);
+      font-weight: 700;
+      margin-left: 4px;
+    }
     @media (max-width: 900px) {
       header, main { padding-left: 16px; padding-right: 16px; }
       table { display: block; overflow-x: auto; }
@@ -126,7 +179,7 @@
   <header>
     <h1>Upstream Fork Sync State</h1>
     <div class="meta">
-      <span>Generated 2026-06-12T11:08:10+00:00</span>
+      <span>Generated 2026-06-12T11:15:36+00:00</span>
       <span>Config <code>config/sync-map.json</code></span>
       <span>Targets tinstaller</span>
     </div>
@@ -161,7 +214,8 @@
           <th>Downstream SHA</th>
           <th>Auth</th>
           <th>Action</th>
-          <th>Error</th>
+          <th>Drill In</th>
+          <th>Sync</th>
         </tr>
       </thead>
       <tbody>
@@ -174,7 +228,36 @@
           <td><code>&lt;missing&gt;</code></td>
           <td>public</td>
           <td>Create mirror branch</td>
-          <td class="error-text"></td>
+          <td><details class="drill">
+              <summary>Inspect</summary>
+              <dl class="detail-grid">
+                <dt>What this means</dt>
+                <dd>The downstream mirror branch does not exist yet and would be created from upstream.</dd>
+                <dt>Recommended action</dt>
+                <dd>Create mirror branch</dd>
+                <dt>Upstream ref</dt>
+                <dd><code>transpara/tinstaller:refs/heads/main</code></dd>
+                <dt>Downstream ref</dt>
+                <dd><code>transpara-ai/tinstaller:refs/heads/upstream/main</code></dd>
+                <dt>Upstream SHA</dt>
+                <dd><code>25bffaeb475b11a6fa97f60779fe3c708532e5f5</code></dd>
+                <dt>Downstream SHA</dt>
+                <dd><code>&lt;missing&gt;</code></dd>
+                <dt>Auth mode</dt>
+                <dd>public</dd>
+                <dt>Sync command</dt>
+                <dd><code>gh workflow run reconcile.yml --repo transpara-ai/upstream-fork-sync -f config_path=config/sync-map.json -f dry_run=false -f target_repositories=tinstaller</code></dd>
+                <dt>Error</dt>
+                <dd class="error-text">None</dd>
+              </dl>
+            </details></td>
+          <td>
+            <div class="actions">
+              <a class="button" href="https://github.com/transpara-ai/upstream-fork-sync/actions/workflows/reconcile.yml" target="_blank" rel="noopener noreferrer">Sync now</a>
+              <button class="button secondary" type="button" data-copy="gh workflow run reconcile.yml --repo transpara-ai/upstream-fork-sync -f config_path=config/sync-map.json -f dry_run=false -f target_repositories=tinstaller">Copy command</button>
+              <span class="copied" aria-live="polite"></span>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -194,6 +277,21 @@
     }
     search.addEventListener("input", applyFilters);
     state.addEventListener("change", applyFilters);
+    for (const button of document.querySelectorAll("[data-copy]")) {
+      button.addEventListener("click", async () => {
+        const value = button.getAttribute("data-copy");
+        const label = button.parentElement.querySelector(".copied");
+        try {
+          await navigator.clipboard.writeText(value);
+          if (label) {
+            label.textContent = "Copied";
+            setTimeout(() => label.textContent = "", 1600);
+          }
+        } catch (error) {
+          window.prompt("Copy this command", value);
+        }
+      });
+    }
   </script>
 </body>
 </html>
