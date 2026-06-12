@@ -30,6 +30,12 @@
       border-bottom: 1px solid var(--line);
       background: var(--surface);
     }
+    .header-top {
+      align-items: center;
+      display: flex;
+      gap: 16px;
+      justify-content: space-between;
+    }
     h1 {
       margin: 0 0 8px;
       font-size: 28px;
@@ -142,6 +148,23 @@
       background: #ffffff;
       color: var(--button);
     }
+    .icon-button {
+      align-items: center;
+      background: var(--button);
+      border: 1px solid var(--button);
+      border-radius: 6px;
+      color: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      flex: 0 0 auto;
+      font: inherit;
+      font-size: 24px;
+      font-weight: 700;
+      height: 38px;
+      justify-content: center;
+      line-height: 1;
+      width: 38px;
+    }
     details.drill {
       max-width: 620px;
     }
@@ -236,17 +259,165 @@
       background: var(--surface);
       outline: none;
     }
+    .add-repo-dialog {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 24px 80px rgba(23, 32, 51, 0.22);
+      color: var(--ink);
+      max-width: min(920px, calc(100vw - 32px));
+      padding: 0;
+      width: 920px;
+    }
+    .add-repo-dialog::backdrop {
+      background: rgba(23, 32, 51, 0.42);
+    }
+    .dialog-header {
+      align-items: center;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 16px;
+      justify-content: space-between;
+      padding: 16px 18px;
+    }
+    .dialog-header h2 {
+      font-size: 18px;
+      margin: 0;
+    }
+    .close-button {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      min-height: 32px;
+      padding: 4px 9px;
+    }
+    .add-repo-body {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+    }
+    .add-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.1fr);
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+    .field span {
+      color: #30394c;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .field-row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .owner-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    }
+    .owner-button {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+      min-height: 38px;
+      padding: 7px 10px;
+      text-align: left;
+    }
+    .owner-button[aria-pressed="true"] {
+      border-color: var(--button);
+      color: var(--button);
+    }
+    .repo-browser-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .repo-browser-tools input {
+      min-width: min(260px, 100%);
+    }
+    .repo-list {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      margin-top: 10px;
+      max-height: 240px;
+      overflow: auto;
+    }
+    .repo-item {
+      align-items: center;
+      background: #ffffff;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink);
+      cursor: pointer;
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr auto;
+      padding: 10px;
+      text-align: left;
+      width: 100%;
+    }
+    .repo-item:last-child {
+      border-bottom: 0;
+    }
+    .repo-item:hover, .repo-item:focus {
+      background: var(--surface);
+      outline: none;
+    }
+    .repo-item strong, .repo-item span {
+      display: block;
+    }
+    .repo-item .repo-meta {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .preview-box {
+      display: grid;
+      gap: 10px;
+    }
+    .preview-box pre {
+      background: #f3f5f9;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      margin: 0;
+      max-height: 220px;
+      overflow: auto;
+      padding: 10px;
+      white-space: pre-wrap;
+    }
+    .dialog-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
     @media (max-width: 900px) {
       header, main { padding-left: 16px; padding-right: 16px; }
+      .add-grid, .field-row { grid-template-columns: 1fr; }
       table { display: block; overflow-x: auto; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Upstream Fork Sync State</h1>
+    <div class="header-top">
+      <h1>Upstream Fork Sync State</h1>
+      <button id="add-repo-button" class="icon-button" type="button" aria-label="Add upstream repository" title="Add upstream repository">+</button>
+    </div>
     <div class="meta">
-      <span>Generated 2026-06-12T11:32:34+00:00</span>
+      <span>Generated 2026-06-12T11:53:54+00:00</span>
       <span>Config <code>config/sync-map.json</code></span>
       <span>Targets tinstaller</span>
     </div>
@@ -337,6 +508,85 @@
         </tr>
       </tbody>
     </table>
+    <dialog id="add-repo-dialog" class="add-repo-dialog" aria-labelledby="add-repo-title">
+      <div class="dialog-header">
+        <h2 id="add-repo-title">Add Upstream Repository</h2>
+        <form method="dialog">
+          <button class="close-button" type="submit">Close</button>
+        </form>
+      </div>
+      <div class="add-repo-body">
+        <div class="add-grid">
+          <section aria-label="Choose upstream repository">
+            <label class="field" for="upstream-url">
+              <span>Paste GitHub upstream URL</span>
+              <input id="upstream-url" type="url" placeholder="https://github.com/owner/repo">
+            </label>
+            <p class="muted">Paste any GitHub repository URL, including non-Transpara upstreams.</p>
+
+            <div class="field">
+              <span>Browse supervised collections</span>
+              <div class="owner-grid" id="owner-grid">
+                <button class="owner-button" type="button" data-owner="michaelsaucier">michaelsaucier</button>
+                <button class="owner-button" type="button" data-owner="transpara">transpara</button>
+                <button class="owner-button" type="button" data-owner="transpara-ai">transpara-ai</button>
+              </div>
+            </div>
+            <div class="repo-browser-tools">
+              <input id="repo-filter" type="search" placeholder="Filter loaded repositories">
+              <a id="owner-repos-link" class="button secondary" href="https://github.com/orgs/transpara-ai/repositories" target="_blank" rel="noopener noreferrer">Open collection</a>
+            </div>
+            <div id="repo-results" class="repo-list" aria-live="polite">
+              <div class="empty">Choose a collection to load public repositories, or paste a private repository URL above.</div>
+            </div>
+          </section>
+
+          <section class="preview-box" aria-label="Generated mapping">
+            <div class="field-row">
+              <label class="field" for="config-name">
+                <span>Config name</span>
+                <input id="config-name" type="text" placeholder="repo-name">
+              </label>
+              <label class="field" for="upstream-auth">
+                <span>Upstream auth</span>
+                <select id="upstream-auth">
+                  <option value="public">public</option>
+                  <option value="token">token</option>
+                </select>
+              </label>
+            </div>
+            <div class="field-row">
+              <label class="field" for="upstream-branch">
+                <span>Upstream branch</span>
+                <input id="upstream-branch" type="text" value="main">
+              </label>
+              <label class="field" for="downstream-branch">
+                <span>Mirror branch</span>
+                <input id="downstream-branch" type="text" value="upstream/main">
+              </label>
+            </div>
+            <label class="field" for="downstream-owner">
+              <span>Downstream fork owner</span>
+              <input id="downstream-owner" type="text" value="transpara-ai">
+            </label>
+            <div>
+              <span class="muted">Config entry</span>
+              <pre><code id="config-entry-preview">Paste or select an upstream repository.</code></pre>
+            </div>
+            <div>
+              <span class="muted">Append command</span>
+              <pre><code id="add-command-preview">Paste or select an upstream repository.</code></pre>
+            </div>
+            <div class="dialog-actions">
+              <button id="copy-config-entry" class="button" type="button">Copy config entry</button>
+              <button id="copy-add-command" class="button secondary" type="button">Copy command</button>
+              <a class="button secondary" href="https://github.com/transpara-ai/upstream-fork-sync/blob/main/config/sync-map.json" target="_blank" rel="noopener noreferrer">Open config</a>
+              <span id="add-repo-copied" class="copied" aria-live="polite"></span>
+            </div>
+          </section>
+        </div>
+      </div>
+    </dialog>
   </main>
   <script>
     const search = document.querySelector("#search");
@@ -364,6 +614,198 @@
         window.prompt("Copy this command", value);
       }
     }
+    const addRepoDialog = document.querySelector("#add-repo-dialog");
+    const addRepoButton = document.querySelector("#add-repo-button");
+    const upstreamUrl = document.querySelector("#upstream-url");
+    const configName = document.querySelector("#config-name");
+    const upstreamAuth = document.querySelector("#upstream-auth");
+    const upstreamBranch = document.querySelector("#upstream-branch");
+    const downstreamBranch = document.querySelector("#downstream-branch");
+    const downstreamOwner = document.querySelector("#downstream-owner");
+    const configEntryPreview = document.querySelector("#config-entry-preview");
+    const addCommandPreview = document.querySelector("#add-command-preview");
+    const repoResults = document.querySelector("#repo-results");
+    const repoFilter = document.querySelector("#repo-filter");
+    const ownerReposLink = document.querySelector("#owner-repos-link");
+    const addRepoCopied = document.querySelector("#add-repo-copied");
+    let loadedRepos = [];
+    function parseGitHubRepo(value) {
+      const raw = value.trim();
+      if (!raw) {
+        return null;
+      }
+      const ssh = raw.match(/^git@github\.com:([^/]+)\/(.+?)(?:\.git)?\/?$/);
+      if (ssh) {
+        return validateRepoParts(ssh[1], ssh[2]);
+      }
+      const direct = raw.match(/^([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)$/);
+      if (direct) {
+        return `${direct[1]}/${direct[2]}`;
+      }
+      let candidate = raw;
+      if (candidate.startsWith("github.com/")) {
+        candidate = `https://${candidate}`;
+      }
+      try {
+        const url = new URL(candidate);
+        if (url.hostname !== "github.com") {
+          return null;
+        }
+        const parts = url.pathname.split("/").filter(Boolean);
+        if (parts.length < 2) {
+          return null;
+        }
+        return validateRepoParts(parts[0], parts[1]);
+      } catch (error) {
+        return null;
+      }
+    }
+    function validateRepoParts(owner, repo) {
+      const cleanRepo = repo.replace(/\.git$/, "");
+      if (!/^[A-Za-z0-9_.-]+$/.test(owner) || !/^[A-Za-z0-9_.-]+$/.test(cleanRepo)) {
+        return null;
+      }
+      return `${owner}/${cleanRepo}`;
+    }
+    function shellQuote(value) {
+      return `'${String(value).replace(/'/g, `'"'"'`)}'`;
+    }
+    function buildEntry(repo) {
+      const repoName = repo.split("/")[1];
+      const entry = {
+        name: configName.value.trim() || repoName,
+        upstream: repo,
+        forks: [
+          {
+            repo: `${downstreamOwner.value.trim() || "transpara-ai"}/${repoName}`,
+            branches: [
+              {
+                upstream: upstreamBranch.value.trim() || "main",
+                downstream: downstreamBranch.value.trim() || "upstream/main",
+              },
+            ],
+          },
+        ],
+      };
+      if (upstreamAuth.value === "token") {
+        entry.upstreamAuth = "token";
+      }
+      return entry;
+    }
+    function buildAddCommand(repo, entry) {
+      const branch = entry.forks[0].branches[0];
+      const parts = [
+        "python3",
+        "scripts/add_mapping.py",
+        "--config",
+        "config/sync-map.json",
+        "--upstream",
+        repo,
+        "--name",
+        entry.name,
+        "--fork-owner",
+        downstreamOwner.value.trim() || "transpara-ai",
+        "--upstream-auth",
+        upstreamAuth.value,
+        "--upstream-branch",
+        branch.upstream,
+        "--downstream-branch",
+        branch.downstream,
+      ];
+      return parts.map(shellQuote).join(" ");
+    }
+    function updateAddPreview() {
+      const repo = parseGitHubRepo(upstreamUrl.value);
+      if (!repo) {
+        configEntryPreview.textContent = "Paste or select an upstream repository.";
+        addCommandPreview.textContent = "Paste or select an upstream repository.";
+        return;
+      }
+      const repoName = repo.split("/")[1];
+      if (!configName.dataset.touched) {
+        configName.value = repoName;
+      }
+      const entry = buildEntry(repo);
+      configEntryPreview.textContent = JSON.stringify(entry, null, 2);
+      addCommandPreview.textContent = buildAddCommand(repo, entry);
+    }
+    function selectUpstream(repo) {
+      upstreamUrl.value = `https://github.com/${repo}`;
+      if (!configName.dataset.touched) {
+        configName.value = repo.split("/")[1];
+      }
+      updateAddPreview();
+    }
+    function ownerCollectionUrl(owner) {
+      if (owner === "michaelsaucier") {
+        return `https://github.com/${owner}?tab=repositories`;
+      }
+      return `https://github.com/orgs/${owner}/repositories`;
+    }
+    function renderRepos() {
+      const query = repoFilter.value.trim().toLowerCase();
+      const repos = loadedRepos.filter((repo) => !query || repo.full_name.toLowerCase().includes(query));
+      if (!repos.length) {
+        repoResults.innerHTML = `<div class="empty">No public repositories matched. Paste the URL above for private repositories.</div>`;
+        return;
+      }
+      repoResults.innerHTML = "";
+      for (const repo of repos) {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "repo-item";
+        item.innerHTML = `<span><strong></strong><span class="repo-meta"></span></span><span>Use</span>`;
+        item.querySelector("strong").textContent = repo.name;
+        item.querySelector(".repo-meta").textContent = repo.full_name;
+        item.addEventListener("click", () => selectUpstream(repo.full_name));
+        repoResults.appendChild(item);
+      }
+    }
+    async function loadOwner(owner) {
+      for (const button of document.querySelectorAll("[data-owner]")) {
+        button.setAttribute("aria-pressed", String(button.dataset.owner === owner));
+      }
+      ownerReposLink.href = ownerCollectionUrl(owner);
+      repoResults.innerHTML = `<div class="empty">Loading ${owner} repositories...</div>`;
+      repoFilter.value = "";
+      const apiPath = owner === "michaelsaucier" ? "users" : "orgs";
+      try {
+        const response = await fetch(`https://api.github.com/${apiPath}/${owner}/repos?per_page=100&sort=updated&direction=desc`);
+        if (!response.ok) {
+          throw new Error(`GitHub returned ${response.status}`);
+        }
+        loadedRepos = await response.json();
+        renderRepos();
+      } catch (error) {
+        loadedRepos = [];
+        repoResults.innerHTML = `<div class="empty">Could not load public repositories. Open the collection or paste the repository URL.</div>`;
+      }
+    }
+    addRepoButton.addEventListener("click", () => {
+      if (typeof addRepoDialog.showModal === "function") {
+        addRepoDialog.showModal();
+      }
+      upstreamUrl.focus();
+    });
+    for (const input of [upstreamUrl, upstreamAuth, upstreamBranch, downstreamBranch, downstreamOwner]) {
+      input.addEventListener("input", updateAddPreview);
+      input.addEventListener("change", updateAddPreview);
+    }
+    configName.addEventListener("input", () => {
+      configName.dataset.touched = "true";
+      updateAddPreview();
+    });
+    for (const button of document.querySelectorAll("[data-owner]")) {
+      button.addEventListener("click", () => loadOwner(button.dataset.owner));
+    }
+    repoFilter.addEventListener("input", renderRepos);
+    document.querySelector("#copy-config-entry").addEventListener("click", async () => {
+      await copyCommand(configEntryPreview.textContent, addRepoCopied);
+    });
+    document.querySelector("#copy-add-command").addEventListener("click", async () => {
+      await copyCommand(addCommandPreview.textContent, addRepoCopied);
+    });
+    updateAddPreview();
     for (const button of document.querySelectorAll("[data-copy]")) {
       button.addEventListener("click", async () => {
         const value = button.getAttribute("data-copy");
