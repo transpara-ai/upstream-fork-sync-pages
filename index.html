@@ -121,7 +121,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      min-width: 180px;
+      min-width: 112px;
     }
     .button {
       align-items: center;
@@ -169,59 +169,72 @@
       font-weight: 700;
       margin-left: 4px;
     }
-    .sync-dialog {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: 0 24px 80px rgba(23, 32, 51, 0.22);
-      color: var(--ink);
-      max-width: min(760px, calc(100vw - 32px));
-      padding: 0;
-      width: 760px;
-    }
-    .sync-dialog::backdrop {
-      background: rgba(23, 32, 51, 0.42);
-    }
-    .dialog-header {
-      align-items: center;
-      background: var(--surface);
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 16px 18px;
-    }
-    .dialog-header h2 {
-      font-size: 18px;
-      margin: 0;
-    }
-    .dialog-body {
-      display: grid;
-      gap: 14px;
-      padding: 18px;
-    }
-    .dialog-body p {
-      margin: 0;
-    }
     .command-box {
       background: #f3f5f9;
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 10px;
     }
-    .dialog-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .more-cell {
+      position: relative;
+      text-align: right;
+      width: 1%;
     }
-    .close-button {
+    .more-menu {
+      display: inline-block;
+      position: relative;
+    }
+    .more-menu summary {
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      font-size: 18px;
+      font-weight: 700;
+      height: 34px;
+      justify-content: center;
+      line-height: 1;
+      list-style: none;
+      width: 34px;
+    }
+    .more-menu summary::-webkit-details-marker {
+      display: none;
+    }
+    .more-menu[open] summary {
+      background: var(--surface);
+    }
+    .more-menu-panel {
       background: #ffffff;
       border: 1px solid var(--line);
       border-radius: 6px;
+      box-shadow: 0 12px 36px rgba(23, 32, 51, 0.16);
+      display: grid;
+      gap: 2px;
+      min-width: 176px;
+      padding: 6px;
+      position: absolute;
+      right: 0;
+      top: 38px;
+      z-index: 5;
+    }
+    .menu-item {
+      background: #ffffff;
+      border: 0;
+      border-radius: 4px;
       color: var(--ink);
       cursor: pointer;
+      display: block;
       font: inherit;
-      min-height: 32px;
-      padding: 4px 9px;
+      padding: 8px 10px;
+      text-align: left;
+      text-decoration: none;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .menu-item:hover, .menu-item:focus {
+      background: var(--surface);
+      outline: none;
     }
     @media (max-width: 900px) {
       header, main { padding-left: 16px; padding-right: 16px; }
@@ -233,7 +246,7 @@
   <header>
     <h1>Upstream Fork Sync State</h1>
     <div class="meta">
-      <span>Generated 2026-06-12T11:22:53+00:00</span>
+      <span>Generated 2026-06-12T11:32:34+00:00</span>
       <span>Config <code>config/sync-map.json</code></span>
       <span>Targets tinstaller</span>
     </div>
@@ -241,9 +254,9 @@
   <main>
     <section class="summary" aria-label="Summary">
       <div class="metric"><strong>1</strong><span>Total</span></div>
-      <div class="metric"><strong>0</strong><span>Current</span></div>
+      <div class="metric"><strong>1</strong><span>Current</span></div>
       <div class="metric"><strong>0</strong><span>Drift</span></div>
-      <div class="metric"><strong>1</strong><span>Missing</span></div>
+      <div class="metric"><strong>0</strong><span>Missing</span></div>
       <div class="metric"><strong>0</strong><span>Errors</span></div>
     </section>
     <section class="controls" aria-label="Filters">
@@ -270,25 +283,26 @@
           <th>Action</th>
           <th>Drill In</th>
           <th>Sync</th>
+          <th>More</th>
         </tr>
       </thead>
       <tbody>
-        <tr data-state="missing">
-          <td><span class="status missing">Missing</span></td>
+        <tr data-state="current">
+          <td><span class="status current">Current</span></td>
           <td><code>tinstaller</code></td>
           <td><code>transpara/tinstaller:main</code></td>
           <td><code>transpara-ai/tinstaller:upstream/main</code></td>
           <td><code>25bffaeb475b</code></td>
-          <td><code>&lt;missing&gt;</code></td>
+          <td><code>25bffaeb475b</code></td>
           <td>public</td>
-          <td>Create mirror branch</td>
+          <td>No action</td>
           <td><details class="drill">
               <summary>Inspect</summary>
               <dl class="detail-grid">
                 <dt>What this means</dt>
-                <dd>The downstream mirror branch does not exist yet and would be created from upstream.</dd>
+                <dd>The downstream mirror branch points at the same commit as the upstream branch.</dd>
                 <dt>Recommended action</dt>
-                <dd>Create mirror branch</dd>
+                <dd>No action</dd>
                 <dt>Upstream ref</dt>
                 <dd><code>transpara/tinstaller:refs/heads/main</code></dd>
                 <dt>Downstream ref</dt>
@@ -296,7 +310,7 @@
                 <dt>Upstream SHA</dt>
                 <dd><code>25bffaeb475b11a6fa97f60779fe3c708532e5f5</code></dd>
                 <dt>Downstream SHA</dt>
-                <dd><code>&lt;missing&gt;</code></dd>
+                <dd><code>25bffaeb475b11a6fa97f60779fe3c708532e5f5</code></dd>
                 <dt>Auth mode</dt>
                 <dd>public</dd>
                 <dt>Sync command</dt>
@@ -307,32 +321,22 @@
             </details></td>
           <td>
             <div class="actions">
-              <button class="button" type="button" data-sync-open data-command="gh workflow run reconcile.yml --repo transpara-ai/upstream-fork-sync -f config_path=config/sync-map.json -f dry_run=false -f target_repositories=tinstaller" data-summary="Create mirror branch for tinstaller: transpara/tinstaller:main -&gt; transpara-ai/tinstaller:upstream/main." data-workflow="https://github.com/transpara-ai/upstream-fork-sync/actions/workflows/reconcile.yml">Sync now</button>
-              <button class="button secondary" type="button" data-copy="gh workflow run reconcile.yml --repo transpara-ai/upstream-fork-sync -f config_path=config/sync-map.json -f dry_run=false -f target_repositories=tinstaller">Copy command</button>
+              <button class="button" type="button" data-copy="gh workflow run reconcile.yml --repo transpara-ai/upstream-fork-sync -f config_path=config/sync-map.json -f dry_run=false -f target_repositories=tinstaller" title="Copy authenticated CLI sync command">Sync now</button>
               <span class="copied" aria-live="polite"></span>
             </div>
+          </td>
+          <td class="more-cell">
+            <details class="more-menu">
+              <summary aria-label="More actions for tinstaller" title="More actions">...</summary>
+              <div class="more-menu-panel">
+                <button class="menu-item" type="button" data-copy="gh workflow run reconcile.yml --repo transpara-ai/upstream-fork-sync -f config_path=config/sync-map.json -f dry_run=false -f target_repositories=tinstaller">Copy command</button>
+                <a class="menu-item" href="https://github.com/transpara-ai/upstream-fork-sync/actions/workflows/reconcile.yml" target="_blank" rel="noopener noreferrer">Open workflow</a>
+              </div>
+            </details>
           </td>
         </tr>
       </tbody>
     </table>
-    <dialog id="sync-dialog" class="sync-dialog">
-      <div class="dialog-header">
-        <h2>Run Targeted Sync</h2>
-        <form method="dialog">
-          <button class="close-button" type="submit">Close</button>
-        </form>
-      </div>
-      <div class="dialog-body">
-        <p id="sync-dialog-summary"></p>
-        <p class="muted">GitHub does not support pre-filled workflow dispatch URLs. Use the command below from an authenticated terminal, or open the workflow and enter the target manually.</p>
-        <div class="command-box"><code id="sync-dialog-command"></code></div>
-        <div class="dialog-actions">
-          <button class="button" type="button" id="sync-dialog-copy">Copy command</button>
-          <a class="button secondary" id="sync-dialog-workflow" href="https://github.com/transpara-ai/upstream-fork-sync/actions/workflows/reconcile.yml" target="_blank" rel="noopener noreferrer">Open workflow</a>
-          <span class="copied" id="sync-dialog-copied" aria-live="polite"></span>
-        </div>
-      </div>
-    </dialog>
   </main>
   <script>
     const search = document.querySelector("#search");
@@ -349,13 +353,6 @@
     }
     search.addEventListener("input", applyFilters);
     state.addEventListener("change", applyFilters);
-    const dialog = document.querySelector("#sync-dialog");
-    const dialogSummary = document.querySelector("#sync-dialog-summary");
-    const dialogCommand = document.querySelector("#sync-dialog-command");
-    const dialogCopy = document.querySelector("#sync-dialog-copy");
-    const dialogWorkflow = document.querySelector("#sync-dialog-workflow");
-    const dialogCopied = document.querySelector("#sync-dialog-copied");
-    let activeCommand = "";
     async function copyCommand(value, label) {
       try {
         await navigator.clipboard.writeText(value);
@@ -370,27 +367,14 @@
     for (const button of document.querySelectorAll("[data-copy]")) {
       button.addEventListener("click", async () => {
         const value = button.getAttribute("data-copy");
-        const label = button.parentElement.querySelector(".copied");
+        const label = button.closest("tr")?.querySelector(".copied");
         await copyCommand(value, label);
-      });
-    }
-    for (const button of document.querySelectorAll("[data-sync-open]")) {
-      button.addEventListener("click", () => {
-        activeCommand = button.getAttribute("data-command");
-        dialogSummary.textContent = button.getAttribute("data-summary");
-        dialogCommand.textContent = activeCommand;
-        dialogWorkflow.href = button.getAttribute("data-workflow");
-        dialogCopied.textContent = "";
-        if (typeof dialog.showModal === "function") {
-          dialog.showModal();
-        } else {
-          window.prompt("Run this command", activeCommand);
+        const menu = button.closest("details.more-menu");
+        if (menu) {
+          menu.open = false;
         }
       });
     }
-    dialogCopy.addEventListener("click", async () => {
-      await copyCommand(activeCommand, dialogCopied);
-    });
   </script>
 </body>
 </html>
