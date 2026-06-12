@@ -356,6 +356,12 @@
       max-height: 240px;
       overflow: auto;
     }
+    .repo-list-status {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      padding: 8px 10px;
+    }
     .repo-item {
       align-items: center;
       background: #ffffff;
@@ -383,6 +389,22 @@
     .repo-item .repo-meta {
       color: var(--muted);
       font-size: 12px;
+    }
+    .fetch-more-button {
+      background: #ffffff;
+      border: 0;
+      border-top: 1px solid var(--line);
+      color: var(--button);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+      padding: 10px;
+      text-align: left;
+      width: 100%;
+    }
+    .fetch-more-button:hover, .fetch-more-button:focus {
+      background: var(--surface);
+      outline: none;
     }
     .preview-box {
       display: grid;
@@ -417,7 +439,7 @@
       <button id="add-repo-button" class="icon-button" type="button" aria-label="Add upstream repository" title="Add upstream repository">+</button>
     </div>
     <div class="meta">
-      <span>Generated 2026-06-12T11:53:54+00:00</span>
+      <span>Generated 2026-06-12T12:04:10+00:00</span>
       <span>Config <code>config/sync-map.json</code></span>
       <span>Targets tinstaller</span>
     </div>
@@ -628,7 +650,14 @@
     const repoFilter = document.querySelector("#repo-filter");
     const ownerReposLink = document.querySelector("#owner-repos-link");
     const addRepoCopied = document.querySelector("#add-repo-copied");
+    const REPO_PAGE_SIZE = 50;
+    const REPO_AUTO_FETCH_LIMIT = 250;
     let loadedRepos = [];
+    let activeOwner = "";
+    let activeApiPath = "";
+    let nextRepoPage = 1;
+    let hasMoreRepos = false;
+    let repoFetchInProgress = false;
     function parseGitHubRepo(value) {
       const raw = value.trim();
       if (!raw) {
@@ -744,21 +773,91 @@
     }
     function renderRepos() {
       const query = repoFilter.value.trim().toLowerCase();
-      const repos = loadedRepos.filter((repo) => !query || repo.full_name.toLowerCase().includes(query));
+      const repos = loadedRepos
+        .filter((repo) => !query || repo.full_name.toLowerCase().includes(query))
+        .sort((left, right) => left.full_name.localeCompare(right.full_name));
+      repoResults.innerHTML = "";
+      const status = document.createElement("div");
+      status.className = "repo-list-status";
+      status.textContent = hasMoreRepos
+        ? `Showing ${repos.length} matching repositories from ${loadedRepos.length} loaded.`
+        : `Showing ${repos.length} of ${loadedRepos.length} public repositories alphabetically.`;
+      repoResults.appendChild(status);
       if (!repos.length) {
-        repoResults.innerHTML = `<div class="empty">No public repositories matched. Paste the URL above for private repositories.</div>`;
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No public repositories matched. Paste the URL above for private repositories.";
+        repoResults.appendChild(empty);
+      } else {
+        for (const repo of repos) {
+          const item = document.createElement("button");
+          item.type = "button";
+          item.className = "repo-item";
+          item.innerHTML = `<span><strong></strong><span class="repo-meta"></span></span><span>Use</span>`;
+          item.querySelector("strong").textContent = repo.name;
+          item.querySelector(".repo-meta").textContent = repo.full_name;
+          item.addEventListener("click", () => selectUpstream(repo.full_name));
+          repoResults.appendChild(item);
+        }
+      }
+      if (hasMoreRepos) {
+        const more = document.createElement("button");
+        more.type = "button";
+        more.className = "fetch-more-button";
+        more.textContent = repoFetchInProgress ? "Fetching..." : "Fetch more";
+        more.disabled = repoFetchInProgress;
+        more.addEventListener("click", () => fetchRepoPages(1));
+        repoResults.appendChild(more);
+      }
+    }
+    function dedupeAndSortRepos() {
+      const byName = new Map();
+      for (const repo of loadedRepos) {
+        byName.set(repo.full_name, repo);
+      }
+      loadedRepos = Array.from(byName.values()).sort((left, right) => left.full_name.localeCompare(right.full_name));
+    }
+    function responseHasNextPage(response) {
+      return (response.headers.get("Link") || "").includes('rel="next"');
+    }
+    async function fetchRepoPages(maxPages) {
+      if (repoFetchInProgress || !activeOwner || !hasMoreRepos) {
         return;
       }
-      repoResults.innerHTML = "";
-      for (const repo of repos) {
-        const item = document.createElement("button");
-        item.type = "button";
-        item.className = "repo-item";
-        item.innerHTML = `<span><strong></strong><span class="repo-meta"></span></span><span>Use</span>`;
-        item.querySelector("strong").textContent = repo.name;
-        item.querySelector(".repo-meta").textContent = repo.full_name;
-        item.addEventListener("click", () => selectUpstream(repo.full_name));
-        repoResults.appendChild(item);
+      repoFetchInProgress = true;
+      renderRepos();
+      try {
+        let pagesFetched = 0;
+        while (hasMoreRepos && pagesFetched < maxPages) {
+          const response = await fetch(
+            `https://api.github.com/${activeApiPath}/${activeOwner}/repos?per_page=${REPO_PAGE_SIZE}&page=${nextRepoPage}&sort=full_name&direction=asc`
+          );
+          if (!response.ok) {
+            throw new Error(`GitHub returned ${response.status}`);
+          }
+          const repos = await response.json();
+          if (!Array.isArray(repos)) {
+            throw new Error("GitHub returned an unexpected response");
+          }
+          loadedRepos.push(...repos);
+          nextRepoPage += 1;
+          pagesFetched += 1;
+          hasMoreRepos = responseHasNextPage(response);
+          if (!repos.length) {
+            hasMoreRepos = false;
+          }
+        }
+        dedupeAndSortRepos();
+        renderRepos();
+      } catch (error) {
+        hasMoreRepos = false;
+        loadedRepos = [];
+        repoResults.innerHTML = `<div class="empty">Could not load public repositories. Open the collection or paste the repository URL.</div>`;
+      } finally {
+        repoFetchInProgress = false;
+        if (loadedRepos.length) {
+          renderRepos();
+        }
       }
     }
     async function loadOwner(owner) {
@@ -768,18 +867,12 @@
       ownerReposLink.href = ownerCollectionUrl(owner);
       repoResults.innerHTML = `<div class="empty">Loading ${owner} repositories...</div>`;
       repoFilter.value = "";
-      const apiPath = owner === "michaelsaucier" ? "users" : "orgs";
-      try {
-        const response = await fetch(`https://api.github.com/${apiPath}/${owner}/repos?per_page=100&sort=updated&direction=desc`);
-        if (!response.ok) {
-          throw new Error(`GitHub returned ${response.status}`);
-        }
-        loadedRepos = await response.json();
-        renderRepos();
-      } catch (error) {
-        loadedRepos = [];
-        repoResults.innerHTML = `<div class="empty">Could not load public repositories. Open the collection or paste the repository URL.</div>`;
-      }
+      activeOwner = owner;
+      activeApiPath = owner === "michaelsaucier" ? "users" : "orgs";
+      loadedRepos = [];
+      nextRepoPage = 1;
+      hasMoreRepos = true;
+      await fetchRepoPages(Math.ceil(REPO_AUTO_FETCH_LIMIT / REPO_PAGE_SIZE));
     }
     addRepoButton.addEventListener("click", () => {
       if (typeof addRepoDialog.showModal === "function") {
